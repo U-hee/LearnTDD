@@ -9,36 +9,33 @@ import sample.tdd.command.CreateSellerCommand;
 @RestController
 public record SellerSignUpController() {
 
+    static final String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    static final String usernameRegex = "^[a-zA-z0-9-_]{3,}$";
+
     @PostMapping("/seller/signUp")
     ResponseEntity<?> singUp(@RequestBody CreateSellerCommand command) {
-
-        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        String usernameRegex = "^[a-zA-z0-9-_]*$";
-
-        if (command.email() == null) {
+        if (!isCommandValid(command)) {
             return ResponseEntity.badRequest().build();
-        } else if (!command.email().contains("@") || command.email().endsWith("@")) {
-            return ResponseEntity.badRequest().build();
-        } else if (!command.email().matches(emailRegex)) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.username() == null) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.username().isBlank()) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.username().length() < 3) {
-            return ResponseEntity.badRequest().build();
-        } else if (!command.username().matches(usernameRegex)) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.password() == null) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.password().isBlank()) {
-            return ResponseEntity.badRequest().build();
-        } else if (command.password().length() < 8) {
-            return ResponseEntity.badRequest().build();
-        } else {
-            return ResponseEntity.noContent().build();
         }
 
+        return ResponseEntity.noContent().build();
+    }
+
+    private static boolean isCommandValid(CreateSellerCommand command) {
+        return isEmailValid(command.email()) && isUsernameValid(command.username()) && isPasswordValid( command.password());
+    }
+
+    private static boolean isEmailValid(String email) {
+        return email != null && email.matches(emailRegex);
+    }
+
+    private static boolean isUsernameValid(String username) {
+        return username != null && username.matches(usernameRegex);
+
+    }
+
+    private static boolean isPasswordValid(String password) {
+        return password != null && password.length() >= 8;
     }
 }
 
