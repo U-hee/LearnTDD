@@ -1,6 +1,5 @@
 package sample.tdd.api.seller.signup;
 
-import org.assertj.core.api.TemporalAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,6 +12,8 @@ import sample.tdd.TddApplication;
 import sample.tdd.command.CreateSellerCommand;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static sample.tdd.EmailGenerator.generateEmail;
+import static sample.tdd.UsernameGenerator.generateUsername;
 
 @SpringBootTest(
         classes = TddApplication.class,
@@ -27,7 +28,7 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", "test", "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail() , generateUsername(), "testPassword");
 
         // Act
             // 1st: API URI
@@ -45,7 +46,7 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand(null, "test", "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(null, generateUsername(), "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -66,7 +67,7 @@ public class POST_specs {
     })
     void error_400(String email, @Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand(email, "test", "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(email, generateUsername(), "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -80,7 +81,8 @@ public class POST_specs {
     @Test
     void error_400_username(@Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", null, "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail()
+, null, "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -100,7 +102,8 @@ public class POST_specs {
     })
     void error_400_username_invalid(String username, @Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", username, "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail()
+, username, "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -120,7 +123,8 @@ public class POST_specs {
     })
     void success_204_username_valid(String username, @Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", username, "testPassword");
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail()
+, username, "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -133,7 +137,8 @@ public class POST_specs {
     @Test
     void error_400_password_is_null(@Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", "test", null);
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail()
+, generateUsername(), null);
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
@@ -152,10 +157,56 @@ public class POST_specs {
     })
     void error_400_password_invalid(String password, @Autowired TestRestTemplate client) {
         // Arrange
-        CreateSellerCommand command = new CreateSellerCommand("test@email.com", "test", password);
+        CreateSellerCommand command = new CreateSellerCommand(generateEmail()
+, generateUsername(), password);
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("email 속성에 이미 존재하는 이메일 주소가 지정되면 400 Bad Request 상태코드 반환")
+    void error_400_email_already(@Autowired TestRestTemplate client) {
+        // Arrange
+        String email = generateEmail();
+
+        client.postForEntity(
+                "/seller/signUp",
+                new CreateSellerCommand(email, generateUsername(), "password"),
+                Void.class);
+
+        // Act
+
+        ResponseEntity<Void> response = client.postForEntity(
+                "/seller/signUp",
+                new CreateSellerCommand(email, generateUsername(), "password"),
+                Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+
+    }
+
+    @DisplayName("username 속성에 이미 존재하는 사용자 이름이 지정되면 400 Bad Request 상태코드를 반환한다.")
+    @Test
+    void error_400_username_already(@Autowired TestRestTemplate client){
+        // Arrange
+        String username = generateUsername();
+
+        client.postForEntity(
+                "/seller/signUp",
+                new CreateSellerCommand(generateEmail(), username, "password"),
+                Void.class);
+
+        // Act
+
+        ResponseEntity<Void> response = client.postForEntity(
+                "/seller/signUp",
+                new CreateSellerCommand(generateEmail(), username, "password"),
+                Void.class);
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);

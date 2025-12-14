@@ -1,13 +1,16 @@
 package sample.tdd.api.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import sample.tdd.Seller;
+import sample.tdd.SellerRepository;
 import sample.tdd.command.CreateSellerCommand;
 
 @RestController
-public record SellerSignUpController() {
+public record SellerSignUpController(SellerRepository sellerRepository) {
 
     static final String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     static final String usernameRegex = "^[a-zA-z0-9-_]{3,}$";
@@ -17,6 +20,16 @@ public record SellerSignUpController() {
         if (!isCommandValid(command)) {
             return ResponseEntity.badRequest().build();
         }
+
+        var seller = new Seller();
+        seller.setEmail(command.email());
+        seller.setUsername(command.username());
+        try {
+            sellerRepository.save(seller);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
 
         return ResponseEntity.noContent().build();
     }
