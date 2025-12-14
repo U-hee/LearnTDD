@@ -39,7 +39,8 @@ curl -i -X Post 'http://localhost:8080/seller/signUp' \
 - [x] 올바르게 요청하면 204 No Content status 코드를 반환한다.
 - [x] email 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.
 - [x] email 속성이 email 주소 형식이 아니면 400 Bad Request 상태코드를 반환한다.
-- [ ] username 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.
+- [x] username 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.
+- [x] username 속성이 올바른 형식을 따르면 204 No Content 상태코드를 반환한다.
 - [ ] username 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다.
 - [ ] password 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.
 - [ ] password 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다.

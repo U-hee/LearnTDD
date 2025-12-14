@@ -74,4 +74,57 @@ public class POST_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(400);
 
     }
+
+    @DisplayName("username 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.")
+    @Test
+    void error_400_username(@Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand("test@email.com", null, "testPassword");
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @DisplayName("username 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다.")
+    @ParameterizedTest
+    @ValueSource( strings = {
+            "",
+            "2글",
+            "test ",
+            "test.",
+            "test!"
+    })
+    void error_400_username_invalid(String username, @Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand("test@email.com", username, "testPassword");
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @DisplayName("username 속성이 올바른 형식을 따르면 204 No Content 상태코드를 반환한다.")
+    @ParameterizedTest
+    @ValueSource( strings = {
+            "test",
+            "ABCVEFDAFEWAFEAWFDSA",
+            "01020322332",
+            "test-",
+            "test_"
+    })
+    void success_204_username_valid(String username, @Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand("test@email.com", username, "testPassword");
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
 }
