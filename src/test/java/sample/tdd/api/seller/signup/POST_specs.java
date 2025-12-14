@@ -2,6 +2,8 @@ package sample.tdd.api.seller.signup;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -19,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class POST_specs {
     // 올바르게 요청하면 204 No Content 상태코드를 반환한다.
     @Test
-    void 올바르게_요청하면_204_No_Content_상태코드를_반환한다(
+    @DisplayName("올바르게 요청하면 204 No Content 상태코드를 반환한다.")
+    void success_204(
             @Autowired TestRestTemplate client
     ) {
         // Arrange
@@ -42,6 +45,27 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(null, "test", "testPassword");
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+
+    }
+
+    @DisplayName("email 속성이 email 주소 형식이 아니면 400 Bad Request 상태코드를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "invalid-email",
+            "invalid-email@",
+            "invalid-email@aaa",
+            "invalid-email@aaa.",
+            "invalid-email@.com",
+    })
+    void error_400(String email, @Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(email, "test", "testPassword");
 
         // Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
