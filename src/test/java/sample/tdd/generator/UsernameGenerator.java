@@ -1,4 +1,4 @@
-package sample.tdd;
+package sample.tdd.generator;
 
 import java.util.UUID;
 

@@ -12,8 +12,8 @@ import sample.tdd.TddApplication;
 import sample.tdd.command.CreateSellerCommand;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static sample.tdd.EmailGenerator.generateEmail;
-import static sample.tdd.UsernameGenerator.generateUsername;
+import static sample.tdd.generator.EmailGenerator.generateEmail;
+import static sample.tdd.generator.UsernameGenerator.generateUsername;
 
 @SpringBootTest(
         classes = TddApplication.class,
