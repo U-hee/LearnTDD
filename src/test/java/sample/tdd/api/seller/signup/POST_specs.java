@@ -1,5 +1,6 @@
 package sample.tdd.api.seller.signup;
 
+import org.assertj.core.api.TemporalAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -126,5 +127,37 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
+
+    @DisplayName("password 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다.")
+    @Test
+    void error_400_password_is_null(@Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand("test@email.com", "test", null);
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+
+    }
+
+    @DisplayName("password 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "",
+            "1234",
+            "1234567"
+    })
+    void error_400_password_invalid(String password, @Autowired TestRestTemplate client) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand("test@email.com", "test", password);
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity("/seller/signUp", command, Void.class);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 }
