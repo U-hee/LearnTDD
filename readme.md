@@ -46,8 +46,8 @@ curl -i -X Post 'http://localhost:8080/seller/signUp' \
 - [x] password 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다.
 - [x] email 속성에 이미 존재하는 이메일 주소가 지정되면 400 Bad Request 상태코드 반환
 - [x] username 속성에 이미 존재하는 사용자 이름이 지정되면 400 Bad Request 상태코드를 반환한다.
-- [ ] username 속성에 3자 미만의 사용자 이름이 지정되면 400 Bad Request 상태코드를 반환한다.
-- [ ] password 속성에 올바르게 암호화를 지정한다.
+- [x] username 속성에 3자 미만의 사용자 이름이 지정되면 400 Bad Request 상태코드를 반환한다.
+- [x] password 속성에 올바르게 암호화를 지정한다.
 
 ### 현재 상태 메모
 - username은 `^[a-zA-z0-9-_]{3,}$` 정규식으로 3자 미만/허용되지 않는 문자를 400으로 차단하고 있음(체크리스트는 미반영).
